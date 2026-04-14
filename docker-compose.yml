@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: mq
+      POSTGRES_PASSWORD: mq_local
+      POSTGRES_DB: movingquicker
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file: .env.production
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+volumes:
+  pgdata:

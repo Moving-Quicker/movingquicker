@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Visitor {
+  id        String   @id @default(cuid())
+  variant   String   @db.VarChar(1) // "A" or "B"
+  userAgent String?
+  referrer  String?
+  ip        String?  @db.VarChar(45)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  events Event[]
+  leads  Lead[]
+
+  @@index([variant])
+  @@index([createdAt])
+  @@map("visitors")
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  visitorId String   @map("visitor_id")
+  type      String   @db.VarChar(50)
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+
+  @@index([visitorId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("events")
+}
+
+model Lead {
+  id           String   @id @default(cuid())
+  visitorId    String   @map("visitor_id")
+  name         String
+  whatsapp     String
+  businessType String?  @map("business_type")
+  message      String
+  source       String   @db.VarChar(20) // "form", "chat", "whatsapp"
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+
+  @@index([visitorId])
+  @@index([source])
+  @@index([createdAt])
+  @@map("leads")
+}
