@@ -15,7 +15,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBackRounded";
 import CalendarTodayIcon from "@mui/icons-material/CalendarTodayRounded";
 import TimerIcon from "@mui/icons-material/TimerRounded";
 import PersonIcon from "@mui/icons-material/PersonRounded";
-import { TrackPageview } from "@/components/track-pageview";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -83,7 +82,6 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh", py: { xs: 4, md: 6 } }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <TrackPageview metadata={{ type: "blog", slug }} />
       <Container maxWidth="md">
         <Button href="/blog" startIcon={<ArrowBackIcon />} sx={{ mb: 3 }} size="small" component="a">
           Volver al blog

@@ -5,6 +5,7 @@ import { ContactEmail } from "./contact-email";
 describe("ContactEmail template", () => {
   const baseProps = {
     name: "María López",
+    email: "maria@ejemplo.com",
     whatsapp: "9991234567",
     businessType: "Restaurante / cafetería",
     message: "Necesito una página para mi restaurante con menú y reservaciones.",
@@ -14,11 +15,20 @@ describe("ContactEmail template", () => {
     const html = await render(ContactEmail(baseProps));
 
     expect(html).toContain("María López");
+    expect(html).toContain("maria@ejemplo.com");
     expect(html).toContain("9991234567");
     expect(html).toContain("Restaurante / cafetería");
     expect(html).toContain(
       "Necesito una página para mi restaurante con menú y reservaciones.",
     );
+  });
+
+  it("hides WhatsApp row when not provided", async () => {
+    const html = await render(
+      ContactEmail({ ...baseProps, whatsapp: undefined }),
+    );
+    expect(html).toContain("maria@ejemplo.com");
+    expect(html).not.toContain("9991234567");
   });
 
   it("includes preview text with the contact name", async () => {
@@ -44,6 +54,7 @@ describe("ContactEmail template", () => {
       ContactEmail({
         ...baseProps,
         name: '<script>alert("xss")</script>',
+        email: "test@ejemplo.com",
         message: "Test <b>bold</b> & special chars",
       }),
     );

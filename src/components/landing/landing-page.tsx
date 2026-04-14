@@ -26,7 +26,6 @@ import Toolbar from "@mui/material/Toolbar";
 import TextField from "@mui/material/TextField";
 import Avatar from "@mui/material/Avatar";
 import Rating from "@mui/material/Rating";
-import Slider from "@mui/material/Slider";
 import Fab from "@mui/material/Fab";
 import Zoom from "@mui/material/Zoom";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -35,9 +34,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
+import LinearProgress from "@mui/material/LinearProgress";
 import type { SvgIconProps } from "@mui/material/SvgIcon";
 import BoltRounded from "@mui/icons-material/BoltRounded";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
@@ -48,7 +45,11 @@ import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import SecurityRounded from "@mui/icons-material/SecurityRounded";
 import SpeedRounded from "@mui/icons-material/SpeedRounded";
-import CalculateRounded from "@mui/icons-material/CalculateRounded";
+import StorefrontRounded from "@mui/icons-material/StorefrontRounded";
+import CodeRounded from "@mui/icons-material/CodeRounded";
+import ArticleRounded from "@mui/icons-material/ArticleRounded";
+import AutoAwesomeRounded from "@mui/icons-material/AutoAwesomeRounded";
+import RocketLaunchRounded from "@mui/icons-material/RocketLaunchRounded";
 import StarRounded from "@mui/icons-material/StarRounded";
 import KeyboardArrowUpRounded from "@mui/icons-material/KeyboardArrowUpRounded";
 import TrendingUpRounded from "@mui/icons-material/TrendingUpRounded";
@@ -58,7 +59,8 @@ import OpenInNewRounded from "@mui/icons-material/OpenInNewRounded";
 import ChevronLeftRounded from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
 import { FadeIn } from "@/components/motion/fade-in";
-import { trackEvent, getVisitorId } from "@/lib/tracking";
+import { ChatQuote } from "@/components/landing/chat-quote";
+import { trackEvent, getVariant } from "@/lib/tracking";
 
 // ---------- helpers & env ----------
 
@@ -73,14 +75,6 @@ function waHref(text: string): string {
   return `https://wa.me/${getWaNumber()}?text=${encodeURIComponent(text)}`;
 }
 
-function fmtMx(n: number): string {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
-
 type IconComp = ComponentType<SvgIconProps>;
 
 // ---------- DATA ----------
@@ -89,7 +83,7 @@ const solutions: {
   icon: IconComp;
   title: string;
   description: string;
-  price: string;
+  tag: string;
   href: string;
   accent: string;
 }[] = [
@@ -98,7 +92,7 @@ const solutions: {
     title: "Presencia Digital",
     description:
       "Landing page profesional, SEO local, Google Maps, WhatsApp integrado. Tu negocio visible para clientes reales.",
-    price: "Desde $5,000 MXN",
+    tag: "Entrega en 1–2 semanas",
     href: "#cotiza",
     accent: "#0D9488",
   },
@@ -107,7 +101,7 @@ const solutions: {
     title: "Software de Gestión",
     description:
       "Automatiza lo que hoy haces en Excel y WhatsApp. Dashboards, cobros automáticos, reportes.",
-    price: "Desde $15,000 MXN",
+    tag: "A la medida de tu negocio",
     href: "#cotiza",
     accent: "#6366F1",
   },
@@ -116,7 +110,7 @@ const solutions: {
     title: "Consultoría Digital",
     description:
       "¿No sabes qué necesitas? Empezamos por ahí. Análisis de negocio, propuesta de solución, roadmap.",
-    price: "Sesión gratuita",
+    tag: "Primera sesión sin costo",
     href: "#cotiza",
     accent: "#F59E0B",
   },
@@ -220,13 +214,19 @@ const steps: { num: number; title: string; desc: string; color: string }[] = [
   {
     num: 2,
     title: "Recibe una propuesta clara",
-    desc: "Alcance, tiempo y precio. Sin letras chiquitas, sin sorpresas.",
+    desc: "Alcance, tiempos y todo lo que incluye. Sin letras chiquitas, sin sorpresas.",
     color: "#6366F1",
   },
   {
     num: 3,
+    title: "Te mostramos un demo gratis",
+    desc: "Armamos un prototipo rápido para que veas la idea aterrizada antes de decidir. Sin costo, sin compromiso.",
+    color: "#F59E0B",
+  },
+  {
+    num: 4,
     title: "Lo construimos y lo entregamos",
-    desc: "Tú apruebas, nosotros implementamos. Incluye 30 días de soporte.",
+    desc: "Si te convence el demo, lo pulimos e implementamos. Incluye 30 días de soporte.",
     color: "#10B981",
   },
 ];
@@ -238,7 +238,7 @@ const faqs: { q: string; a: string }[] = [
   },
   {
     q: "¿Incluye dominio y hosting?",
-    a: "Sí, te ayudamos a configurar todo. El costo del dominio (~$300 MXN/año) va aparte.",
+    a: "Sí, te ayudamos a configurar todo. El dominio va aparte y te indicamos las opciones en tu propuesta.",
   },
   {
     q: "¿Puedo hacer cambios después?",
@@ -272,12 +272,26 @@ const BUSINESS_TYPES = [
 
 type ProjectType = "landing" | "store" | "custom" | "blog";
 
-const PROJECT_BASE: Record<ProjectType, number> = {
-  landing: 5000,
-  store: 12000,
-  custom: 15000,
-  blog: 8000,
-};
+const PROJECT_OPTIONS: {
+  value: ProjectType;
+  label: string;
+  icon: IconComp;
+  desc: string;
+}[] = [
+  { value: "landing", label: "Landing page", icon: WebRounded, desc: "Presencia web profesional" },
+  { value: "store", label: "Tienda online", icon: StorefrontRounded, desc: "Vende tus productos en línea" },
+  { value: "custom", label: "Sistema custom", icon: CodeRounded, desc: "Software a la medida" },
+  { value: "blog", label: "Blog / contenido", icon: ArticleRounded, desc: "Publica y posiciona tu marca" },
+];
+
+const FEATURE_OPTIONS: { key: string; label: string; desc: string }[] = [
+  { key: "seo", label: "SEO y posicionamiento", desc: "Aparece en Google" },
+  { key: "wa", label: "Integración WhatsApp", desc: "Chat directo con clientes" },
+  { key: "domain", label: "Dominio propio", desc: "tunegocio.com" },
+  { key: "analytics", label: "Métricas y reportes", desc: "Mide tus resultados" },
+  { key: "mnt", label: "Mantenimiento mensual", desc: "Actualizaciones y soporte" },
+  { key: "payments", label: "Cobros en línea", desc: "Recibe pagos automáticos" },
+];
 
 // ---------- SUB-COMPONENTS ----------
 
@@ -455,59 +469,37 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 function QuoteEstimator() {
-  const [projectType, setProjectType] = useState<ProjectType>("landing");
-  const [pages, setPages] = useState(5);
-  const [domain, setDomain] = useState(false);
-  const [seo, setSeo] = useState(false);
-  const [maintenance, setMaintenance] = useState(false);
-  const [waIntegration, setWaIntegration] = useState(false);
+  const TOTAL_STEPS = 3;
+  const [step, setStep] = useState(1);
+  const [projectType, setProjectType] = useState<ProjectType | null>(null);
+  const [features, setFeatures] = useState<Set<string>>(new Set());
+  const [desc, setDesc] = useState("");
 
-  const { low, high, maintenanceNote } = useMemo(() => {
-    const base = PROJECT_BASE[projectType];
-    const pageFactor = 1 + (pages - 1) * 0.06;
-    let subtotal = base * pageFactor;
-    if (domain) subtotal += 500;
-    if (seo) subtotal += 2000;
-    if (waIntegration) subtotal += 3000;
-    const lowRounded = Math.round(subtotal / 500) * 500;
-    const highRounded = Math.round((lowRounded * 1.5) / 500) * 500;
-    return {
-      low: lowRounded,
-      high: highRounded,
-      maintenanceNote: maintenance,
-    };
-  }, [projectType, pages, domain, seo, maintenance, waIntegration]);
+  const toggleFeature = useCallback((key: string) => {
+    setFeatures((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
 
-  const waMessage =
-    `Hola, vengo de Moving Quicker. Quiero cotizar un proyecto:\n` +
-    `— Tipo: ${projectType}\n` +
-    `— Páginas aprox.: ${pages}\n` +
-    `— Extras: ${[
-      domain && "Dominio propio",
-      seo && "SEO básico",
-      maintenance && "Mantenimiento mensual",
-      waIntegration && "Integración WhatsApp",
-    ]
-      .filter(Boolean)
-      .join(", ") || "ninguno"}\n` +
-    `— Rango estimado en la web: ${fmtMx(low)} – ${fmtMx(high)}`;
+  const selectedLabel =
+    PROJECT_OPTIONS.find((o) => o.value === projectType)?.label ?? "";
 
-  const extraChips: { key: string; label: string; on: boolean; toggle: () => void }[] = [
-    { key: "dom", label: "Dominio propio", on: domain, toggle: () => setDomain((v) => !v) },
-    { key: "seo", label: "SEO básico", on: seo, toggle: () => setSeo((v) => !v) },
-    {
-      key: "mnt",
-      label: "Mantenimiento mensual",
-      on: maintenance,
-      toggle: () => setMaintenance((v) => !v),
-    },
-    {
-      key: "wa",
-      label: "Integración WhatsApp",
-      on: waIntegration,
-      toggle: () => setWaIntegration((v) => !v),
-    },
-  ];
+  const waMessage = useMemo(() => {
+    const featureLabels = FEATURE_OPTIONS.filter((f) => features.has(f.key)).map((f) => f.label);
+    return (
+      `Hola, vengo de Moving Quicker. Quiero cotizar un proyecto:\n` +
+      `— Tipo: ${selectedLabel || "No seleccionado"}\n` +
+      `— Funcionalidades: ${featureLabels.join(", ") || "ninguna seleccionada"}\n` +
+      (desc ? `— Descripción: ${desc}\n` : "") +
+      `\n¿Me pueden enviar una propuesta personalizada?`
+    );
+  }, [selectedLabel, features, desc]);
+
+  const canAdvance = step === 1 ? !!projectType : true;
+  const progress = (step / TOTAL_STEPS) * 100;
 
   return (
     <Card
@@ -520,111 +512,276 @@ function QuoteEstimator() {
       }}
     >
       <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
-          <CalculateRounded color="primary" sx={{ fontSize: 32 }} />
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
+          <AutoAwesomeRounded color="primary" sx={{ fontSize: 32 }} />
           <Box>
             <Typography variant="h5" component="h2" sx={{ fontWeight: 800 }}>
-              Estimador rápido
+              Configura tu proyecto
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Ajusta opciones y obtén un rango orientativo en pesos mexicanos.
+              3 pasos rápidos y te enviamos una propuesta personalizada.
             </Typography>
           </Box>
         </Stack>
 
-        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>
-          ¿Qué tipo de proyecto?
-        </Typography>
-        <FormControl component="fieldset" sx={{ mb: 3, width: "100%" }}>
-          <RadioGroup
-            value={projectType}
-            onChange={(e) => setProjectType(e.target.value as ProjectType)}
-            aria-label="Tipo de proyecto"
-          >
-            <FormControlLabel value="landing" control={<Radio color="primary" />} label="Landing page" />
-            <FormControlLabel value="store" control={<Radio color="primary" />} label="Tienda online" />
-            <FormControlLabel value="custom" control={<Radio color="primary" />} label="Sistema custom" />
-            <FormControlLabel value="blog" control={<Radio color="primary" />} label="Blog/contenido" />
-          </RadioGroup>
-        </FormControl>
-
-        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>
-          Número de páginas / secciones: {pages}
-        </Typography>
-        <Slider
-          value={pages}
-          onChange={(_, v) => setPages(v as number)}
-          min={1}
-          max={20}
-          valueLabelDisplay="auto"
-          aria-label="Número de páginas"
-          sx={{
-            mb: 3,
-            color: "primary.main",
-            "& .MuiSlider-thumb": { bgcolor: "primary.main" },
-            "& .MuiSlider-track": { bgcolor: "primary.main" },
-          }}
-        />
-
-        <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 700 }}>
-          Extras (toca para activar)
-        </Typography>
-        <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 3 }}>
-          {extraChips.map((c) => (
-            <Chip
-              key={c.key}
-              label={c.label}
-              onClick={c.toggle}
-              color={c.on ? "primary" : "default"}
-              variant={c.on ? "filled" : "outlined"}
-              sx={{ fontWeight: 600 }}
-            />
-          ))}
-        </Stack>
-
-        <Box
-          sx={{
-            bgcolor: "primary.main",
-            color: "primary.contrastText",
-            borderRadius: 2,
-            p: 3,
-            mb: 2,
-          }}
-        >
-          <Typography variant="overline" sx={{ opacity: 0.9, letterSpacing: 1 }}>
-            Estimado orientativo
-          </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 800, my: 1 }}>
-            {fmtMx(low)} – {fmtMx(high)}
-          </Typography>
-          {maintenanceNote && (
-            <Typography variant="body2" sx={{ opacity: 0.95, mb: 1 }}>
-              + {fmtMx(1500)} MXN/mes por mantenimiento (no incluido en el rango).
+        <Box sx={{ mb: 3 }}>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+              Paso {step} de {TOTAL_STEPS}
             </Typography>
-          )}
-          <Typography variant="body2" sx={{ opacity: 0.88, mb: 2 }}>
-            El precio final depende de alcance y complejidad. Te lo detallamos en una cotización formal.
-          </Typography>
-          <Button
-            component="a"
-            href={waHref(waMessage)}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="contained"
-            fullWidth
-            endIcon={<ArrowForwardRounded />}
+            <Typography variant="caption" color="primary" sx={{ fontWeight: 700 }}>
+              {Math.round(progress)}%
+            </Typography>
+          </Stack>
+          <LinearProgress
+            variant="determinate"
+            value={progress}
             sx={{
-              bgcolor: "common.white",
-              color: "primary.dark",
-              fontWeight: 800,
-              textTransform: "none",
-              py: 1.25,
-              "&:hover": { bgcolor: "grey.100" },
+              height: 6,
+              borderRadius: 3,
+              bgcolor: "action.hover",
+              "& .MuiLinearProgress-bar": { borderRadius: 3 },
             }}
-          >
-            Cotiza el precio exacto
-          </Button>
+          />
         </Box>
+
+        <AnimatePresence mode="wait">
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 700 }}>
+                ¿Qué tipo de proyecto necesitas?
+              </Typography>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                  gap: 1.5,
+                  mb: 3,
+                }}
+              >
+                {PROJECT_OPTIONS.map((opt) => {
+                  const Icon = opt.icon;
+                  const selected = projectType === opt.value;
+                  return (
+                    <Box
+                      key={opt.value}
+                      onClick={() => {
+                        setProjectType(opt.value);
+                        trackEvent("configurator_step", { step: 2, projectType: opt.value });
+                        setTimeout(() => setStep(2), 250);
+                      }}
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        border: "2px solid",
+                        borderColor: selected ? "primary.main" : "divider",
+                        bgcolor: selected ? "rgba(13,148,136,0.08)" : "transparent",
+                        cursor: "pointer",
+                        transition: "all 0.2s",
+                        position: "relative",
+                        "&:hover": {
+                          borderColor: "primary.main",
+                          bgcolor: selected ? "rgba(13,148,136,0.08)" : "action.hover",
+                        },
+                      }}
+                    >
+                      <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Icon sx={{ fontSize: 28, color: "primary.main" }} />
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary" }}>
+                            {opt.label}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "text.secondary" }}
+                          >
+                            {opt.desc}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                      {selected && (
+                        <CheckCircleRounded
+                          color="primary"
+                          sx={{
+                            position: "absolute",
+                            top: 8,
+                            right: 8,
+                            fontSize: 20,
+                          }}
+                        />
+                      )}
+                    </Box>
+                  );
+                })}
+              </Box>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>
+                ¿Qué funcionalidades te interesan?
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 2 }}>
+                Selecciona todas las que apliquen — puedes cambiar después.
+              </Typography>
+              <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 3 }}>
+                {FEATURE_OPTIONS.map((f) => {
+                  const on = features.has(f.key);
+                  return (
+                    <Chip
+                      key={f.key}
+                      label={`${f.label} — ${f.desc}`}
+                      onClick={() => toggleFeature(f.key)}
+                      color={on ? "primary" : "default"}
+                      variant={on ? "filled" : "outlined"}
+                      sx={{ fontWeight: 600, py: 2.5 }}
+                    />
+                  );
+                })}
+              </Stack>
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Box
+                sx={{
+                  bgcolor: "rgba(13,148,136,0.06)",
+                  border: "1px solid",
+                  borderColor: "primary.light",
+                  borderRadius: 2,
+                  p: 2.5,
+                  mb: 3,
+                }}
+              >
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5 }}>
+                  Resumen de tu proyecto
+                </Typography>
+                <Stack spacing={1}>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <CheckCircleRounded color="primary" sx={{ fontSize: 18 }} />
+                    <Typography variant="body2">
+                      <strong>Tipo:</strong> {selectedLabel}
+                    </Typography>
+                  </Stack>
+                  {features.size > 0 && (
+                    <Stack direction="row" spacing={1} alignItems="flex-start">
+                      <CheckCircleRounded color="primary" sx={{ fontSize: 18, mt: 0.25 }} />
+                      <Typography variant="body2">
+                        <strong>Incluye:</strong>{" "}
+                        {FEATURE_OPTIONS.filter((f) => features.has(f.key))
+                          .map((f) => f.label)
+                          .join(", ")}
+                      </Typography>
+                    </Stack>
+                  )}
+                </Stack>
+              </Box>
+
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>
+                Cuéntanos un poco más (opcional)
+              </Typography>
+              <TextField
+                multiline
+                rows={3}
+                value={desc}
+                onChange={(e) => setDesc(e.target.value)}
+                placeholder="¿A qué se dedica tu negocio? ¿Qué problema quieres resolver?"
+                fullWidth
+                sx={{ mb: 3 }}
+              />
+
+              <Button
+                component="a"
+                href={waHref(waMessage)}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="contained"
+                fullWidth
+                size="large"
+                startIcon={<WhatsAppIcon />}
+                endIcon={<RocketLaunchRounded />}
+                onClick={() =>
+                  trackEvent("configurator_submit", {
+                    projectType: projectType ?? "none",
+                    features: Array.from(features).join(","),
+                  })
+                }
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 800,
+                  py: 1.5,
+                  bgcolor: "#25D366",
+                  color: "#fff",
+                  fontSize: "1rem",
+                  "&:hover": { bgcolor: "#1ebe57" },
+                }}
+              >
+                Recibir propuesta personalizada
+              </Button>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", textAlign: "center", mt: 1.5 }}
+              >
+                Sin compromiso — Te respondemos en menos de 24 horas.
+              </Typography>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {step < TOTAL_STEPS && (
+          <Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }}>
+            <Button
+              disabled={step === 1}
+              onClick={() => setStep((s) => s - 1)}
+              sx={{ textTransform: "none", fontWeight: 700 }}
+            >
+              Atrás
+            </Button>
+            <Button
+              variant="contained"
+              disabled={!canAdvance}
+              onClick={() => {
+                trackEvent("configurator_step", { step: step + 1, projectType: projectType ?? "none" });
+                setStep((s) => s + 1);
+              }}
+              endIcon={<ArrowForwardRounded />}
+              sx={{ textTransform: "none", fontWeight: 700 }}
+            >
+              Siguiente
+            </Button>
+          </Stack>
+        )}
+        {step === TOTAL_STEPS && (
+          <Stack direction="row" justifyContent="flex-start" sx={{ mt: 1 }}>
+            <Button
+              onClick={() => setStep((s) => s - 1)}
+              sx={{ textTransform: "none", fontWeight: 700 }}
+            >
+              Atrás
+            </Button>
+          </Stack>
+        )}
       </CardContent>
     </Card>
   );
@@ -850,60 +1007,31 @@ function CasesCarousel() {
 }
 
 function QuoteSection() {
+  const variant = getVariant("quote-section") ?? "control";
+
+  useEffect(() => {
+    trackEvent("quote_section_view", { variant });
+  }, [variant]);
+
   return (
     <Box id="cotiza" sx={{ py: { xs: 6, md: 8 }, scrollMarginTop: 80 }}>
       <Container maxWidth="md">
         <FadeIn>
           <Typography variant="overline" color="primary" sx={{ fontWeight: 800, letterSpacing: 2 }}>
-            COTIZA
+            COTIZA SIN COMPROMISO
           </Typography>
           <Typography variant="h4" sx={{ fontWeight: 900, mb: 1, mt: 1 }}>
-            Estima tu inversión en minutos
+            {variant === "control" ? "Arma tu proyecto en 1 minuto" : "Cotiza tu proyecto en 1 minuto"}
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-            Si prefieres hablar directo, el botón de WhatsApp lleva el contexto de tu estimación.
+            {variant === "control"
+              ? "Configura lo que necesitas y te enviamos una propuesta personalizada."
+              : "Nuestro asistente te guía paso a paso. Sin compromiso."}
           </Typography>
         </FadeIn>
 
         <FadeIn>
-          <QuoteEstimator />
-        </FadeIn>
-
-        <FadeIn delay={0.04}>
-          <Box
-            component="a"
-            href="/cotiza"
-            onClick={() => trackEvent("click_chat_quote_link")}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-              mt: 4,
-              mb: 2,
-              p: 2,
-              borderRadius: 2,
-              border: "1px dashed",
-              borderColor: "divider",
-              textDecoration: "none",
-              color: "text.primary",
-              transition: "all 0.2s",
-              "&:hover": {
-                borderColor: "primary.main",
-                bgcolor: "action.hover",
-              },
-            }}
-          >
-            <SupportAgentRounded color="primary" />
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                ¿Prefieres que te guiemos paso a paso?
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Nuestro asistente te arma una cotización en 1 minuto.
-              </Typography>
-            </Box>
-            <ArrowForwardRounded fontSize="small" color="action" />
-          </Box>
+          {variant === "control" ? <QuoteEstimator /> : <ChatQuote />}
         </FadeIn>
 
         <Divider sx={{ my: 6 }} />
@@ -917,7 +1045,7 @@ function QuoteSection() {
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
             <DevicesRounded fontSize="small" color="action" />
             <Typography variant="body2" color="text.secondary">
-              ¿Sin WhatsApp ahora? Déjanos tus datos y te escribimos.
+              Déjanos tus datos y te escribimos. Sin compromiso.
             </Typography>
           </Stack>
         </FadeIn>
@@ -972,12 +1100,15 @@ function StickyCTAMobile() {
 
 function ContactForm() {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [businessType, setBusinessType] = useState<string>("");
   const [message, setMessage] = useState("");
+  const [hp, setHp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const mountedAt = useRef(Date.now());
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -989,11 +1120,13 @@ function ContactForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          whatsapp: whatsapp.trim(),
+          email: email.trim(),
+          whatsapp: whatsapp.trim() || undefined,
           businessType: businessType || undefined,
           message: message.trim(),
-          visitorId: getVisitorId(),
           source: "form",
+          _hp: hp,
+          _t: mountedAt.current,
         }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
@@ -1004,6 +1137,7 @@ function ContactForm() {
       trackEvent("form_lead_submitted", { businessType: businessType || "unknown" });
       setSuccess(true);
       setName("");
+      setEmail("");
       setWhatsapp("");
       setBusinessType("");
       setMessage("");
@@ -1061,14 +1195,42 @@ function ContactForm() {
         />
         <TextField
           required
-          label="WhatsApp"
+          label="Correo electrónico"
+          name="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          fullWidth
+          placeholder="tu@correo.com"
+          autoComplete="email"
+        />
+        <TextField
+          label="WhatsApp (opcional)"
           name="whatsapp"
           value={whatsapp}
-          onChange={(e) => setWhatsapp(e.target.value)}
+          onChange={(e) => {
+            const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+            const parts = [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 10)].filter(Boolean);
+            setWhatsapp(parts.join(" "));
+          }}
           fullWidth
-          placeholder="Ej. 9991234567"
+          placeholder="999 123 4567"
           autoComplete="tel"
+          inputProps={{ maxLength: 12, inputMode: "numeric" }}
         />
+        <Box
+          sx={{ position: "absolute", left: -9999, opacity: 0, height: 0, overflow: "hidden" }}
+          aria-hidden="true"
+        >
+          <TextField
+            label="No llenar"
+            name="website"
+            value={hp}
+            onChange={(e) => setHp(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </Box>
         <FormControl fullWidth>
           <InputLabel id="biz-type-label">Tipo de negocio</InputLabel>
           <Select
@@ -1378,9 +1540,17 @@ export function LandingPage() {
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 72 }}>
                       {s.description}
                     </Typography>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: s.accent }}>
-                      {s.price}
-                    </Typography>
+                    <Chip
+                      label={s.tag}
+                      size="small"
+                      sx={{
+                        mb: 2,
+                        bgcolor: `${s.accent}14`,
+                        color: s.accent,
+                        fontWeight: 700,
+                        border: `1px solid ${s.accent}30`,
+                      }}
+                    />
                     <Button
                       href={s.href}
                       endIcon={<ArrowForwardRounded />}
@@ -1415,7 +1585,7 @@ export function LandingPage() {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "repeat(4, 1fr)" },
               gap: { xs: 4, md: 0 },
               position: "relative",
             }}
@@ -1425,10 +1595,10 @@ export function LandingPage() {
                 display: { xs: "none", md: "block" },
                 position: "absolute",
                 top: 28,
-                left: "20%",
-                right: "20%",
+                left: "14%",
+                right: "14%",
                 height: 2,
-                background: "linear-gradient(90deg, #0D9488, #6366F1, #10B981)",
+                background: "linear-gradient(90deg, #0D9488, #6366F1, #F59E0B, #10B981)",
                 opacity: 0.4,
               }}
             />

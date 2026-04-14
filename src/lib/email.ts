@@ -3,7 +3,7 @@ import { render } from "@react-email/render";
 import { ContactEmail, type ContactEmailProps } from "./emails/contact-email";
 
 const SMTP_USER = process.env.SMTP_USER;
-const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || "noreply@movingquicker.com";
+const SMTP_FROM = SMTP_USER || "noreply@movingquicker.com";
 const FROM = `"Moving Quicker" <${SMTP_FROM}>`;
 const CONTACT_TO = process.env.CONTACT_EMAIL || SMTP_USER;
 
@@ -42,7 +42,8 @@ export async function sendContactEmail(
       html,
     });
     return true;
-  } catch {
+  } catch (err) {
+    console.error("[email] sendContactEmail failed:", err);
     return false;
   }
 }
