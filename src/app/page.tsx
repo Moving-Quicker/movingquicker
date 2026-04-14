@@ -34,20 +34,11 @@ export const metadata: Metadata = {
     siteName: "Moving Quicker",
     locale: "es_MX",
     type: "website",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Moving Quicker — Soluciones digitales para tu negocio en México",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Moving Quicker — Soluciones digitales para tu negocio",
     description: "Presencia digital y software para PyMEs en México.",
-    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,
