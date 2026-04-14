@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { getAllPosts, getPostBySlug } from "@/lib/blog";
+import { extractFaqs, getAllPosts, getPostBySlug } from "@/lib/blog";
 import { mdxComponents } from "@/components/mdx/mdx-components";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -15,6 +15,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBackRounded";
 import CalendarTodayIcon from "@mui/icons-material/CalendarTodayRounded";
 import TimerIcon from "@mui/icons-material/TimerRounded";
 import PersonIcon from "@mui/icons-material/PersonRounded";
+import { BlogTracker } from "@/components/blog/blog-tracker";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -40,6 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       absolute: `${post.title} — Blog Moving Quicker`,
     },
     description: post.description,
+    keywords: post.keywords,
     alternates: { canonical: `/blog/${slug}` },
     openGraph: {
       title: post.title,
@@ -67,20 +69,50 @@ export default async function BlogPostPage({ params }: Props) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
+  const faqs = extractFaqs(post.content);
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.description,
-    image: post.image ? `${SITE_URL}${post.image}` : undefined,
-    datePublished: post.date,
-    author: { "@type": "Organization", name: post.author, url: SITE_URL },
-    publisher: { "@type": "Organization", name: "Moving Quicker", url: SITE_URL },
-    mainEntityOfPage: `${SITE_URL}/blog/${slug}`,
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: post.title,
+        description: post.description,
+        image: post.image ? `${SITE_URL}${post.image}` : undefined,
+        datePublished: post.date,
+        author: { "@type": "Organization", name: post.author, url: SITE_URL },
+        publisher: { "@type": "Organization", name: "Moving Quicker", url: SITE_URL },
+        mainEntityOfPage: `${SITE_URL}/blog/${slug}`,
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Inicio", item: SITE_URL },
+          { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
+          { "@type": "ListItem", position: 3, name: post.title, item: `${SITE_URL}/blog/${slug}` },
+        ],
+      },
+      ...(faqs.length > 0
+        ? [
+            {
+              "@type": "FAQPage",
+              mainEntity: faqs.map((faq) => ({
+                "@type": "Question",
+                name: faq.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: faq.answer,
+                },
+              })),
+            },
+          ]
+        : []),
+    ],
   };
 
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh", py: { xs: 4, md: 6 } }}>
+      <BlogTracker slug={slug} title={post.title} tags={post.tags} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Container maxWidth="md">
         <Button href="/blog" startIcon={<ArrowBackIcon />} sx={{ mb: 3 }} size="small" component="a">

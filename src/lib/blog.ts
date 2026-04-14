@@ -12,6 +12,7 @@ export interface BlogPost {
   date: string;
   author: string;
   tags: string[];
+  keywords: string[];
   image?: string;
   published: boolean;
   readingTime: string;
@@ -31,11 +32,48 @@ function parseFrontmatter(slug: string, source: string): BlogPost {
     date: data.date ?? new Date().toISOString(),
     author: data.author ?? "Jorge Sarricolea",
     tags: data.tags ?? [],
+    keywords: data.keywords ?? data.tags ?? [],
     image: data.image,
     published: data.published !== false,
     readingTime: rt.text.replace("read", "lectura"),
     content,
   };
+}
+
+/** Pulls Q&A pairs from the MDX body after `## Preguntas frecuentes` until the next `##` heading. */
+export function extractFaqs(content: string): { question: string; answer: string }[] {
+  const header = "## Preguntas frecuentes";
+  const start = content.indexOf(header);
+  if (start === -1) return [];
+
+  let cursor = start + header.length;
+  while (cursor < content.length && /[\r\n\s]/.test(content[cursor])) cursor++;
+
+  const rest = content.slice(cursor);
+  const endMatch = rest.match(/^## (?![#])/m);
+  const section = endMatch?.index != null ? rest.slice(0, endMatch.index) : rest;
+
+  const faqs: { question: string; answer: string }[] = [];
+  const lines = section.split("\n");
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (line.startsWith("### ")) {
+      const question = line.slice(4).trim();
+      i++;
+      while (i < lines.length && lines[i].trim() === "") i++;
+      const answerLines: string[] = [];
+      while (i < lines.length && !lines[i].startsWith("###")) {
+        answerLines.push(lines[i]);
+        i++;
+      }
+      const answer = answerLines.join("\n").trim();
+      if (question && answer) faqs.push({ question, answer });
+      continue;
+    }
+    i++;
+  }
+  return faqs;
 }
 
 export function getAllPosts(): BlogPostMeta[] {

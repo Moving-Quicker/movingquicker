@@ -849,7 +849,7 @@ function CasesCarousel() {
         <Typography variant="overline" color="primary" sx={{ fontWeight: 800, letterSpacing: 2 }}>
           PROYECTOS EN PRODUCCIÓN
         </Typography>
-        <Typography variant="h4" sx={{ fontWeight: 900, mb: 1, mt: 1 }}>
+        <Typography variant="h4" component="h2" sx={{ fontWeight: 900, mb: 1, mt: 1 }}>
           Soluciones reales para problemas reales
         </Typography>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 4 }}>
@@ -934,7 +934,7 @@ function CasesCarousel() {
                 size="small"
                 sx={{ fontWeight: 600, mb: 1.5, bgcolor: `${c.color}18`, color: c.color, border: `1px solid ${c.color}30` }}
               />
-              <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h6" component="h3" sx={{ fontWeight: 800, mb: 1 }}>
                 {c.name}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5, lineHeight: 1.6 }}>
@@ -1020,7 +1020,7 @@ function QuoteSection() {
           <Typography variant="overline" color="primary" sx={{ fontWeight: 800, letterSpacing: 2 }}>
             COTIZA SIN COMPROMISO
           </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 900, mb: 1, mt: 1 }}>
+          <Typography variant="h4" component="h2" sx={{ fontWeight: 900, mb: 1, mt: 1 }}>
             {variant === "control" ? "Arma tu proyecto en 1 minuto" : "Cotiza tu proyecto en 1 minuto"}
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
@@ -1424,7 +1424,7 @@ export function LandingPage() {
           <Typography variant="overline" color="primary" sx={{ fontWeight: 800, letterSpacing: 2 }}>
             ANTES → DESPUÉS
           </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 900, mb: 4, mt: 1 }}>
+          <Typography variant="h4" component="h2" sx={{ fontWeight: 900, mb: 4, mt: 1 }}>
             Del caos digital al control
           </Typography>
         </FadeIn>
@@ -1486,7 +1486,7 @@ export function LandingPage() {
             <Typography variant="overline" color="primary" sx={{ fontWeight: 800, letterSpacing: 2 }}>
               SOLUCIONES
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 900, mb: 1, mt: 1 }}>
+            <Typography variant="h4" component="h2" sx={{ fontWeight: 900, mb: 1, mt: 1 }}>
               Lo que construimos para tu negocio
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 640 }}>
@@ -1534,7 +1534,7 @@ export function LandingPage() {
                     >
                       <Icon sx={{ fontSize: 30, color: s.accent }} />
                     </Box>
-                    <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
+                    <Typography variant="h5" component="h3" sx={{ fontWeight: 800, mb: 1 }}>
                       {s.title}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 72 }}>
@@ -1578,7 +1578,7 @@ export function LandingPage() {
             <Typography variant="overline" sx={{ fontWeight: 800, letterSpacing: 2, color: "#A5B4FC" }}>
               PROCESO
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 900, mb: 5, mt: 1 }}>
+            <Typography variant="h4" component="h2" sx={{ fontWeight: 900, mb: 5, mt: 1 }}>
               Cómo trabajamos
             </Typography>
           </FadeIn>
@@ -1640,7 +1640,7 @@ export function LandingPage() {
           <Typography variant="overline" sx={{ fontWeight: 800, letterSpacing: 2, color: "#F59E0B" }}>
             FAQ
           </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 900, mb: 3, mt: 1 }}>
+          <Typography variant="h4" component="h2" sx={{ fontWeight: 900, mb: 3, mt: 1 }}>
             Preguntas frecuentes
           </Typography>
         </FadeIn>
@@ -1672,7 +1672,7 @@ export function LandingPage() {
         />
         <Container maxWidth="md">
           <FadeIn>
-            <Typography variant="h4" sx={{ fontWeight: 900, textAlign: "center", mb: 2 }}>
+            <Typography variant="h4" component="h2" sx={{ fontWeight: 900, textAlign: "center", mb: 2 }}>
               ¿Listo para que tu negocio tenga presencia real?
             </Typography>
             <Typography variant="body1" sx={{ textAlign: "center", opacity: 0.92, mb: 4 }}>
