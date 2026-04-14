@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isEmailConfigured, sendContactEmail } from "@/lib/email";
+import { isEmailConfigured, sendContactEmail, sendConfirmationEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -90,6 +90,10 @@ export async function POST(request: Request) {
       { status: 502 },
     );
   }
+
+  sendConfirmationEmail(cleanEmail, cleanName).catch((err) =>
+    console.error("[contact] confirmation email failed:", err),
+  );
 
   return NextResponse.json({ success: true });
 }

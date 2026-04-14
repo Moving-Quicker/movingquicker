@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockSendContactEmail = vi.fn<() => Promise<boolean>>();
+const mockSendConfirmationEmail = vi.fn<() => Promise<boolean>>();
 const mockIsEmailConfigured = vi.fn<() => boolean>();
 const mockPrismaLeadCreate = vi.fn();
 
 vi.mock("@/lib/email", () => ({
   sendContactEmail: (...args: unknown[]) => mockSendContactEmail(...(args as [])),
+  sendConfirmationEmail: (...args: unknown[]) => mockSendConfirmationEmail(...(args as [])),
   isEmailConfigured: () => mockIsEmailConfigured(),
 }));
 
@@ -40,6 +42,7 @@ describe("POST /api/contact", () => {
     vi.clearAllMocks();
     mockIsEmailConfigured.mockReturnValue(true);
     mockSendContactEmail.mockResolvedValue(true);
+    mockSendConfirmationEmail.mockResolvedValue(true);
     mockPrismaLeadCreate.mockResolvedValue({ id: "lead-1" });
   });
 
@@ -68,6 +71,11 @@ describe("POST /api/contact", () => {
       businessType: "Comercio local",
       message: "Quiero una landing page para mi tienda.",
     });
+
+    expect(mockSendConfirmationEmail).toHaveBeenCalledWith(
+      "carlos@ejemplo.com",
+      "Carlos Ruiz",
+    );
   });
 
   it("returns 200 with optional businessType missing", async () => {
