@@ -21,7 +21,7 @@ import BoltRounded from "@mui/icons-material/BoltRounded";
 import PersonRounded from "@mui/icons-material/PersonRounded";
 import SendRounded from "@mui/icons-material/SendRounded";
 import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
-import { trackEvent, getVisitorId } from "@/lib/tracking";
+import { trackEvent } from "@/lib/tracking";
 
 // ── Types ──
 
@@ -48,7 +48,7 @@ type Phase =
   | "ASK_PAGES"
   | "ASK_EXTRAS"
   | "ASK_NAME"
-  | "ASK_WHATSAPP"
+  | "ASK_EMAIL"
   | "ASK_MESSAGE"
   | "SENDING"
   | "DONE";
@@ -68,21 +68,6 @@ const EXTRAS = [
   { key: "whatsapp", label: "Integración WhatsApp" },
 ];
 
-const BASE_PRICES: Record<string, number> = {
-  landing: 5000,
-  store: 12000,
-  custom: 15000,
-  blog: 8000,
-  unsure: 8000,
-};
-
-function fmtMx(n: number) {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
 
 // ── Sub-components ──
 
@@ -168,7 +153,7 @@ export function ChatQuote() {
   const [pages, setPages] = useState("");
   const [extras, setExtras] = useState<string[]>([]);
   const [name, setName] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
   const scroll = useCallback(() => {
@@ -252,21 +237,9 @@ export function ChatQuote() {
     const selected = extras.length > 0 ? extras.map((e) => EXTRAS.find((x) => x.key === e)?.label).join(", ") : "Ninguno";
     userMsg(selected);
 
-    const base = BASE_PRICES[projectType] ?? 8000;
-    const pageFactor = 1 + (Math.max(1, parseInt(pages) || 5) - 1) * 0.06;
-    let subtotal = base * pageFactor;
-    if (extras.includes("domain")) subtotal += 500;
-    if (extras.includes("seo")) subtotal += 2000;
-    if (extras.includes("whatsapp")) subtotal += 3000;
-    const low = Math.round(subtotal / 500) * 500;
-    const high = Math.round((low * 1.5) / 500) * 500;
-
-    const hasMaintenance = extras.includes("maintenance");
-
     await typeMany(
-      `Basado en lo que me dices, tu proyecto estaría entre ${fmtMx(low)} y ${fmtMx(high)} MXN.${hasMaintenance ? ` + ${fmtMx(1500)}/mes por mantenimiento.` : ""}`,
-      "Este es un estimado orientativo. Para darte un precio exacto necesitamos conocerte un poco más.",
-      "¿Cómo te llamas?",
+      "¡Perfecto! Ya tengo todo lo que necesito para prepararte una propuesta personalizada.",
+      "Solo necesito unos datos para contactarte. ¿Cómo te llamas?",
     );
     setPhase("ASK_NAME");
   };
@@ -274,13 +247,13 @@ export function ChatQuote() {
   const onName = async () => {
     if (!name.trim()) return;
     userMsg(name.trim());
-    await typeOne(`¡Mucho gusto, ${name.trim()}! ¿Cuál es tu número de WhatsApp?`);
-    setPhase("ASK_WHATSAPP");
+    await typeOne(`¡Mucho gusto, ${name.trim()}! ¿Cuál es tu correo electrónico?`);
+    setPhase("ASK_EMAIL");
   };
 
-  const onWhatsapp = async () => {
-    if (!whatsapp.trim()) return;
-    userMsg(whatsapp.trim());
+  const onEmail = async () => {
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return;
+    userMsg(email.trim());
     await typeOne("Por último, cuéntanos brevemente sobre tu negocio o proyecto. ¿Qué problema quieres resolver?");
     setPhase("ASK_MESSAGE");
   };
@@ -297,11 +270,11 @@ export function ChatQuote() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          whatsapp: whatsapp.trim(),
+          email: email.trim(),
           businessType: PROJECT_OPTIONS.find((p) => p.key === projectType)?.label ?? "",
           message: `[Chat Quote] Tipo: ${projectType}, Páginas: ${pages}, Extras: ${extras.join(",") || "ninguno"}. Mensaje: ${message.trim()}`,
-          visitorId: getVisitorId(),
           source: "chat",
+          _t: Date.now() - 30000,
         }),
       });
 
@@ -455,22 +428,22 @@ export function ChatQuote() {
           />
         );
 
-      case "ASK_WHATSAPP":
+      case "ASK_EMAIL":
         return (
           <TextField
-            value={whatsapp}
-            onChange={(e) => setWhatsapp(e.target.value)}
-            placeholder="Ej: 9991234567"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="tu@correo.com"
             size="small"
-            type="tel"
+            type="email"
             fullWidth
-            autoComplete="tel"
-            onKeyDown={(e) => e.key === "Enter" && onWhatsapp()}
+            autoComplete="email"
+            onKeyDown={(e) => e.key === "Enter" && onEmail()}
             slotProps={{
               input: {
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={onWhatsapp} size="small" color="primary">
+                    <IconButton onClick={onEmail} size="small" color="primary">
                       <SendRounded sx={{ fontSize: 18 }} />
                     </IconButton>
                   </InputAdornment>

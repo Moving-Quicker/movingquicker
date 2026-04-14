@@ -13,7 +13,8 @@ import {
 
 export interface ContactEmailProps {
   name: string;
-  whatsapp: string;
+  email: string;
+  whatsapp?: string;
   businessType?: string;
   message: string;
 }
@@ -31,6 +32,7 @@ const colors = {
 
 export function ContactEmail({
   name,
+  email,
   whatsapp,
   businessType,
   message,
@@ -59,9 +61,15 @@ export function ContactEmail({
                   <Column style={valueCell}>{name}</Column>
                 </Row>
                 <Row>
-                  <Column style={labelCell}>WhatsApp</Column>
-                  <Column style={valueCell}>{whatsapp}</Column>
+                  <Column style={labelCell}>Correo</Column>
+                  <Column style={valueCell}>{email}</Column>
                 </Row>
+                {whatsapp && (
+                  <Row>
+                    <Column style={labelCell}>WhatsApp</Column>
+                    <Column style={valueCell}>{whatsapp}</Column>
+                  </Row>
+                )}
                 <Row>
                   <Column style={labelCell}>Tipo de negocio</Column>
                   <Column style={valueCell}>{businessType || "—"}</Column>
@@ -72,9 +80,21 @@ export function ContactEmail({
             <Hr style={hrStyle} />
 
             <Text style={messageLabelStyle}>Mensaje</Text>
-            <Section style={messageBoxStyle}>
-              <Text style={messageTextStyle}>{message}</Text>
-            </Section>
+            <table
+              role="presentation"
+              width="100%"
+              cellSpacing={0}
+              cellPadding={0}
+              style={{ borderCollapse: "collapse" }}
+            >
+              <tbody>
+                <Row>
+                  <Column style={messageBoxStyle}>
+                    <Text style={messageTextStyle}>{message}</Text>
+                  </Column>
+                </Row>
+              </tbody>
+            </table>
           </Section>
 
           <Section style={footerStyle}>
@@ -154,6 +174,7 @@ const messageBoxStyle: React.CSSProperties = {
   borderLeft: `4px solid ${colors.primary}`,
   borderRadius: "0 8px 8px 0",
   padding: "16px 18px",
+  width: "100%",
 };
 
 const messageTextStyle: React.CSSProperties = {
