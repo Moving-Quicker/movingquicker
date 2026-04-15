@@ -7,12 +7,16 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { theme } from "@/theme";
 
+const PH_KEY =
+  process.env.NEXT_PUBLIC_POSTHOG_KEY ?? "phc_tEzFgzf3TCrfzL3MUHwiPDZnvGggV7jAVswxb4AsWmtE";
+const PH_HOST =
+  process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+
 function PostHogInit() {
   useEffect(() => {
-    const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-    if (!key) return;
-    posthog.init(key, {
-      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
+    if (!PH_KEY) return;
+    posthog.init(PH_KEY, {
+      api_host: PH_HOST,
       capture_pageview: true,
       capture_pageleave: true,
       persistence: "localStorage+cookie",
