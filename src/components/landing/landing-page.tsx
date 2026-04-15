@@ -283,14 +283,49 @@ const PROJECT_OPTIONS: {
   { value: "blog", label: "Blog / contenido", icon: ArticleRounded, desc: "Publica y posiciona tu marca" },
 ];
 
-const FEATURE_OPTIONS: { key: string; label: string; desc: string }[] = [
-  { key: "seo", label: "SEO y posicionamiento", desc: "Aparece en Google" },
-  { key: "wa", label: "Integración WhatsApp", desc: "Chat directo con clientes" },
-  { key: "domain", label: "Dominio propio", desc: "tunegocio.com" },
-  { key: "analytics", label: "Métricas y reportes", desc: "Mide tus resultados" },
-  { key: "mnt", label: "Mantenimiento mensual", desc: "Actualizaciones y soporte" },
-  { key: "payments", label: "Cobros en línea", desc: "Recibe pagos automáticos" },
-];
+type FeatureOption = { key: string; label: string; desc: string };
+
+const FEATURES_BY_TYPE: Record<ProjectType, FeatureOption[]> = {
+  landing: [
+    { key: "seo", label: "SEO y posicionamiento", desc: "Aparece en Google" },
+    { key: "wa", label: "Integración WhatsApp", desc: "Chat directo con clientes" },
+    { key: "domain", label: "Dominio propio", desc: "tunegocio.com" },
+    { key: "analytics", label: "Métricas y reportes", desc: "Mide tus resultados" },
+    { key: "mnt", label: "Mantenimiento mensual", desc: "Actualizaciones y soporte" },
+    { key: "gmb", label: "Google Business Profile", desc: "Aparece en Google Maps" },
+  ],
+  store: [
+    { key: "payments", label: "Cobros en línea", desc: "Stripe / MercadoPago" },
+    { key: "catalog", label: "Catálogo de productos", desc: "Con fotos y precios" },
+    { key: "orders", label: "Gestión de pedidos", desc: "Notificaciones automáticas" },
+    { key: "seo", label: "SEO y posicionamiento", desc: "Aparece en Google" },
+    { key: "wa", label: "Integración WhatsApp", desc: "Chat directo con clientes" },
+    { key: "analytics", label: "Métricas de ventas", desc: "Mide tu negocio" },
+    { key: "domain", label: "Dominio propio", desc: "tunegocio.com" },
+    { key: "mnt", label: "Mantenimiento mensual", desc: "Actualizaciones y soporte" },
+  ],
+  custom: [
+    { key: "admin", label: "Panel de administración", desc: "Gestiona todo desde un dashboard" },
+    { key: "integrations", label: "Integraciones", desc: "Pagos, correo, WhatsApp, APIs" },
+    { key: "automation", label: "Automatizaciones", desc: "Cobros, recordatorios, reportes" },
+    { key: "roles", label: "Roles y permisos", desc: "Accesos por usuario" },
+    { key: "db", label: "Base de datos dedicada", desc: "Almacena todo tu negocio" },
+    { key: "analytics", label: "Reportes y métricas", desc: "Decisiones con datos" },
+    { key: "mnt", label: "Soporte y mantenimiento", desc: "Actualizaciones continuas" },
+  ],
+  blog: [
+    { key: "seo", label: "SEO y posicionamiento", desc: "Aparece en Google" },
+    { key: "cms", label: "Panel de contenido", desc: "Publica sin programar" },
+    { key: "newsletter", label: "Newsletter", desc: "Captura suscriptores" },
+    { key: "domain", label: "Dominio propio", desc: "tunegocio.com" },
+    { key: "analytics", label: "Métricas de lectura", desc: "Qué contenido funciona" },
+    { key: "mnt", label: "Mantenimiento mensual", desc: "Actualizaciones y soporte" },
+  ],
+};
+
+const ALL_FEATURES: FeatureOption[] = Object.values(FEATURES_BY_TYPE).flat().filter(
+  (f, i, arr) => arr.findIndex((x) => x.key === f.key) === i,
+);
 
 // ---------- PRICING DATA ----------
 
@@ -502,8 +537,10 @@ function QuoteEstimator() {
   const selectedLabel =
     PROJECT_OPTIONS.find((o) => o.value === projectType)?.label ?? "";
 
+  const currentFeatures = projectType ? FEATURES_BY_TYPE[projectType] : [];
+
   const waMessage = useMemo(() => {
-    const featureLabels = FEATURE_OPTIONS.filter((f) => features.has(f.key)).map((f) => f.label);
+    const featureLabels = ALL_FEATURES.filter((f) => features.has(f.key)).map((f) => f.label);
     return (
       `Hola, vengo de Moving Quicker. Quiero cotizar un proyecto:\n` +
       `— Tipo: ${selectedLabel || "No seleccionado"}\n` +
@@ -588,6 +625,7 @@ function QuoteEstimator() {
                       key={opt.value}
                       onClick={() => {
                         setProjectType(opt.value);
+                        setFeatures(new Set());
                         trackEvent("configurator_step", { step: 2, projectType: opt.value });
                         setTimeout(() => setStep(2), 250);
                       }}
@@ -646,14 +684,17 @@ function QuoteEstimator() {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
             >
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>
-                ¿Qué funcionalidades te interesan?
-              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                  ¿Qué funcionalidades te interesan?
+                </Typography>
+                <Chip label={selectedLabel} size="small" color="primary" variant="outlined" />
+              </Stack>
               <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 2 }}>
                 Selecciona todas las que apliquen — puedes cambiar después.
               </Typography>
               <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 3 }}>
-                {FEATURE_OPTIONS.map((f) => {
+                {currentFeatures.map((f) => {
                   const on = features.has(f.key);
                   return (
                     <Chip
@@ -703,7 +744,7 @@ function QuoteEstimator() {
                       <CheckCircleRounded color="primary" sx={{ fontSize: 18, mt: 0.25 }} />
                       <Typography variant="body2">
                         <strong>Incluye:</strong>{" "}
-                        {FEATURE_OPTIONS.filter((f) => features.has(f.key))
+                        {ALL_FEATURES.filter((f) => features.has(f.key))
                           .map((f) => f.label)
                           .join(", ")}
                       </Typography>
