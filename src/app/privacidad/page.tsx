@@ -3,6 +3,7 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
+import { SiteHeader } from "@/components/layout/site-header";
 
 export const metadata: Metadata = {
   title: "Aviso de Privacidad | Moving Quicker",
@@ -36,6 +37,8 @@ function P({ children }: { children: React.ReactNode }) {
 
 export default function PrivacidadPage() {
   return (
+    <>
+    <SiteHeader />
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pt: { xs: 12, sm: 14 }, pb: 8 }}>
       <Container maxWidth="md">
         <Typography variant="overline" color="primary" sx={{ fontWeight: 800, letterSpacing: 2 }}>
@@ -151,5 +154,6 @@ export default function PrivacidadPage() {
         </Typography>
       </Container>
     </Box>
+    </>
   );
 }

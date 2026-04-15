@@ -117,15 +117,26 @@ export const mdxComponents: MDXComponents = {
   ),
 
   table: (props) => (
-    <TableContainer component={Paper} variant="outlined" sx={{ my: 2 }}>
+    <TableContainer
+      component={Paper}
+      variant="outlined"
+      sx={{ my: 3, borderRadius: 2, overflowX: "auto" }}
+    >
       <Table size="small" {...props} />
     </TableContainer>
   ),
-  thead: (props) => <TableHead {...props} />,
+  thead: (props) => <TableHead sx={{ bgcolor: "action.hover" }} {...props} />,
   tbody: (props) => <TableBody {...props} />,
   tr: (props) => <TableRow hover {...props} />,
-  th: (props) => <TableCell sx={{ fontWeight: 600 }} {...props} />,
-  td: (props) => <TableCell {...props} />,
+  th: (props) => (
+    <TableCell
+      sx={{ fontWeight: 700, whiteSpace: "nowrap", fontSize: "0.85rem", py: 1.5 }}
+      {...props}
+    />
+  ),
+  td: (props) => (
+    <TableCell sx={{ fontSize: "0.875rem", py: 1.2, lineHeight: 1.6 }} {...props} />
+  ),
 
   img: (props) => (
     <Box

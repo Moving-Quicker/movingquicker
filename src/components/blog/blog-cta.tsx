@@ -25,7 +25,7 @@ const variants = {
     title: "¿Este artículo resolvió tu duda?",
     description: "Si necesitas algo más específico para tu negocio, déjanos tus datos y te contactamos con una propuesta.",
     buttonText: "Solicitar cotización",
-    getHref: () => "/#contacto",
+    getHref: () => "/#cotiza",
     target: "_self" as const,
   },
 };
@@ -66,7 +66,13 @@ export function BlogCTA() {
         target={v.target}
         rel={v.target === "_blank" ? "noopener noreferrer" : undefined}
         disabled={href === "#"}
-        onClick={() => trackEvent("blog_cta_click", { variant, buttonText: v.buttonText })}
+        onClick={() => {
+          trackEvent("blog_cta_click", { variant, buttonText: v.buttonText });
+          if (variant !== "form") {
+            trackEvent("wa_click", { location: "blog_cta" });
+            trackEvent("conversion", { type: "whatsapp", location: "blog_cta" });
+          }
+        }}
         sx={{
           bgcolor: "#0D9488",
           "&:hover": { bgcolor: "#0f766e" },

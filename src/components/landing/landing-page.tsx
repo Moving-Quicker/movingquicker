@@ -21,8 +21,7 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
+import { SiteHeader } from "@/components/layout/site-header";
 import TextField from "@mui/material/TextField";
 import Avatar from "@mui/material/Avatar";
 import Rating from "@mui/material/Rating";
@@ -58,6 +57,12 @@ import DevicesRounded from "@mui/icons-material/DevicesRounded";
 import OpenInNewRounded from "@mui/icons-material/OpenInNewRounded";
 import ChevronLeftRounded from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
+import AccessTimeRounded from "@mui/icons-material/AccessTimeRounded";
+import HandshakeRounded from "@mui/icons-material/HandshakeRounded";
+import WorkspacePremiumRounded from "@mui/icons-material/WorkspacePremiumRounded";
+import FormatQuoteRounded from "@mui/icons-material/FormatQuoteRounded";
+import EmailRounded from "@mui/icons-material/EmailRounded";
+import PlaceRounded from "@mui/icons-material/PlaceRounded";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ChatQuote } from "@/components/landing/chat-quote";
 import { trackEvent, getVariant } from "@/lib/tracking";
@@ -254,12 +259,6 @@ const faqs: { q: string; a: string }[] = [
   },
 ];
 
-const navSections: { label: string; href: string }[] = [
-  { label: "Soluciones", href: "#soluciones" },
-  { label: "Trabajos", href: "#trabajos" },
-  { label: "Blog", href: "/blog" },
-  { label: "FAQ", href: "#faq" },
-];
 
 const BUSINESS_TYPES = [
   "Restaurante / cafetería",
@@ -293,114 +292,130 @@ const FEATURE_OPTIONS: { key: string; label: string; desc: string }[] = [
   { key: "payments", label: "Cobros en línea", desc: "Recibe pagos automáticos" },
 ];
 
+// ---------- PRICING DATA ----------
+
+const pricingPackages: {
+  title: string;
+  price: string;
+  period: string;
+  description: string;
+  features: string[];
+  delivery: string;
+  accent: string;
+  icon: IconComp;
+  blogSlug: string;
+  popular?: boolean;
+}[] = [
+  {
+    title: "Landing Page",
+    price: "$8,000",
+    period: "MXN pago único",
+    description: "Presencia web profesional que convierte visitantes en clientes.",
+    features: [
+      "Diseño responsive a medida",
+      "SEO local + Google Business",
+      "Botón WhatsApp integrado",
+      "Formulario de contacto",
+      "Certificado SSL + hosting",
+      "Dominio propio (.com.mx)",
+    ],
+    delivery: "1–2 semanas",
+    accent: "#0D9488",
+    icon: WebRounded,
+    blogSlug: "cuanto-cuesta-pagina-web-mexico",
+  },
+  {
+    title: "Tienda Online",
+    price: "$18,000",
+    period: "MXN pago único",
+    description: "Vende en línea con cobros, catálogo y gestión de pedidos.",
+    features: [
+      "Todo lo de Landing Page",
+      "Catálogo de productos",
+      "Cobros en línea (Stripe / MercadoPago)",
+      "Panel de administración",
+      "Notificaciones de pedidos",
+      "Métricas de ventas",
+    ],
+    delivery: "2–4 semanas",
+    accent: "#6366F1",
+    icon: StorefrontRounded,
+    blogSlug: "cuanto-cuesta-tienda-online-mexico",
+    popular: true,
+  },
+  {
+    title: "Software a Medida",
+    price: "$35,000",
+    period: "MXN desde",
+    description: "Sistema diseñado para tu operación: dashboards, automatización, portales.",
+    features: [
+      "Análisis de requerimientos",
+      "Diseño UX/UI personalizado",
+      "Base de datos dedicada",
+      "Integraciones (pagos, correo, WhatsApp)",
+      "Panel de administración",
+      "Documentación y capacitación",
+    ],
+    delivery: "4–8 semanas",
+    accent: "#F59E0B",
+    icon: CodeRounded,
+    blogSlug: "software-medida-vs-saas",
+  },
+];
+
+// ---------- TRUST STATS ----------
+
+const trustStats: { label: string; value: string; icon: IconComp }[] = [
+  { label: "Proyectos entregados", value: "10+", icon: WorkspacePremiumRounded },
+  { label: "Tiempo de respuesta", value: "<24h", icon: AccessTimeRounded },
+  { label: "Soporte incluido", value: "30 días", icon: HandshakeRounded },
+  { label: "Diseño y código", value: "100% a medida", icon: DevicesRounded },
+];
+
+// ---------- TESTIMONIALS ----------
+
+const testimonials: {
+  quote: string;
+  name: string;
+  role: string;
+  company: string;
+}[] = [
+  {
+    quote: "Nos entregaron el sistema de inscripciones en tiempo récord. El congreso se gestionó sin problemas gracias a la plataforma.",
+    name: "Comité Organizador",
+    role: "Congreso Internacional",
+    company: "ICAIMH",
+  },
+  {
+    quote: "Profesionales y rápidos. La revista quedó lista para indexación internacional con todas las especificaciones que pedimos.",
+    name: "Equipo Editorial",
+    role: "Revista Académica",
+    company: "JAICA Journal",
+  },
+  {
+    quote: "Nuestra presencia digital pasó de cero a tener menú, galería y ubicación. Los clientes nos encuentran mucho más fácil.",
+    name: "Yussef Andueza",
+    role: "Cafetería de Especialidad",
+    company: "Manglar Coffee",
+  },
+];
+
+// ---------- TECH STACK ----------
+
+const techStack: { name: string; color: string }[] = [
+  { name: "React", color: "#61DAFB" },
+  { name: "Next.js", color: "#000000" },
+  { name: "Node.js", color: "#339933" },
+  { name: "TypeScript", color: "#3178C6" },
+  { name: "PostgreSQL", color: "#4169E1" },
+  { name: "Prisma", color: "#2D3748" },
+  { name: "Vercel", color: "#000000" },
+  { name: "Stripe", color: "#635BFF" },
+  { name: "Figma", color: "#F24E1E" },
+  { name: "PostHog", color: "#F9BD2B" },
+];
+
 // ---------- SUB-COMPONENTS ----------
-
-function NavBar() {
-  const [scrolled, setScrolled] = useState(false);
-  const muiTheme = useTheme();
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
-
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 48);
-    window.addEventListener("scroll", handler, { passive: true });
-    handler();
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
-
-  const onDark = !scrolled;
-
-  return (
-    <AppBar
-      position="fixed"
-      elevation={0}
-      sx={{
-        bgcolor: scrolled ? "rgba(255,255,255,0.92)" : "transparent",
-        backdropFilter: scrolled ? "blur(14px)" : "none",
-        borderBottom: scrolled ? "1px solid" : "none",
-        borderColor: "divider",
-        transition: "background-color 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease",
-        boxShadow: "none",
-      }}
-    >
-      <Container maxWidth="lg">
-        <Toolbar disableGutters sx={{ minHeight: { xs: 60, sm: 68 } }}>
-          <BoltRounded
-            sx={{
-              mr: 1,
-              fontSize: 28,
-              color: onDark ? "primary.light" : "primary.main",
-            }}
-          />
-          <Typography
-            variant="body1"
-            component="span"
-            sx={{
-              fontWeight: 800,
-              fontSize: "1.15rem",
-              letterSpacing: "-0.02em",
-              color: onDark ? "common.white" : "text.primary",
-            }}
-          >
-            Moving Quicker
-          </Typography>
-
-          {!isMobile && (
-            <Stack direction="row" spacing={0.5} sx={{ ml: 4, flex: 1, alignItems: "center" }}>
-              {navSections.map((s) =>
-                s.href.startsWith("/") ? (
-                  <Button
-                    key={s.href}
-                    component={Link}
-                    href={s.href}
-                    size="small"
-                    sx={{
-                      color: onDark ? "rgba(255,255,255,0.85)" : "text.secondary",
-                      fontWeight: 500,
-                      textTransform: "none",
-                    }}
-                  >
-                    {s.label}
-                  </Button>
-                ) : (
-                  <Button
-                    key={s.href}
-                    href={s.href}
-                    size="small"
-                    sx={{
-                      color: onDark ? "rgba(255,255,255,0.85)" : "text.secondary",
-                      fontWeight: 500,
-                      textTransform: "none",
-                    }}
-                  >
-                    {s.label}
-                  </Button>
-                ),
-              )}
-            </Stack>
-          )}
-
-          <Box sx={{ flex: 1 }} />
-
-          <Button
-            href="#cotiza"
-            variant="contained"
-            size="medium"
-            onClick={() => trackEvent("cta_click", { location: "navbar" })}
-            sx={{
-              textTransform: "none",
-              fontWeight: 700,
-              borderRadius: 2,
-              px: 2.5,
-              boxShadow: onDark ? "0 8px 24px rgba(13,148,136,0.45)" : undefined,
-            }}
-          >
-            Cotiza gratis
-          </Button>
-        </Toolbar>
-      </Container>
-    </AppBar>
-  );
-}
 
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
@@ -720,12 +735,14 @@ function QuoteEstimator() {
                 size="large"
                 startIcon={<WhatsAppIcon />}
                 endIcon={<RocketLaunchRounded />}
-                onClick={() =>
+                onClick={() => {
+                  trackEvent("wa_click", { location: "configurator", projectType: projectType ?? "none" });
+                  trackEvent("conversion", { type: "whatsapp", location: "configurator", projectType: projectType ?? "none" });
                   trackEvent("configurator_submit", {
                     projectType: projectType ?? "none",
                     features: Array.from(features).join(","),
-                  })
-                }
+                  });
+                }}
                 sx={{
                   textTransform: "none",
                   fontWeight: 800,
@@ -1082,6 +1099,10 @@ function StickyCTAMobile() {
         href={waHref(msg)}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => {
+          trackEvent("wa_click", { location: "fab" });
+          trackEvent("conversion", { type: "whatsapp", location: "fab" });
+        }}
         sx={{
           position: "fixed",
           right: 16,
@@ -1131,10 +1152,12 @@ function ContactForm() {
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
+        trackEvent("form_submit_error", { error: data.error ?? "unknown", status: res.status });
         setError(data.error ?? "No se pudo enviar. Intenta de nuevo.");
         return;
       }
       trackEvent("form_lead_submitted", { businessType: businessType || "unknown" });
+      trackEvent("conversion", { type: "form", location: "contact_form" });
       setSuccess(true);
       setName("");
       setEmail("");
@@ -1142,6 +1165,7 @@ function ContactForm() {
       setBusinessType("");
       setMessage("");
     } catch {
+      trackEvent("form_submit_error", { error: "network", status: 0 });
       setError("Error de red. Revisa tu conexión.");
     } finally {
       setLoading(false);
@@ -1276,16 +1300,13 @@ function ContactForm() {
 export function LandingPage() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  useEffect(() => {
-    trackEvent("page_view", { path: window.location.pathname });
-  }, []);
 
   const finalWa =
     "Hola, quiero que mi negocio tenga presencia digital en México. ¿Me pueden ayudar con una propuesta?";
 
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
-      <NavBar />
+      <SiteHeader transparent />
 
       <Box
         component="header"
@@ -1416,7 +1437,86 @@ export function LandingPage() {
         </Container>
       </Box>
 
+      {/* Trust Stats Bar */}
+      <Box sx={{ py: { xs: 3, md: 4 }, bgcolor: "background.paper", borderBottom: "1px solid", borderColor: "divider" }}>
+        <Container maxWidth="lg">
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "repeat(2, 1fr)", md: "repeat(4, 1fr)" },
+              gap: { xs: 2, md: 4 },
+            }}
+          >
+            {trustStats.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <Stack key={stat.label} direction="row" spacing={1.5} alignItems="center" justifyContent="center">
+                  <Icon sx={{ fontSize: 28, color: "primary.main" }} />
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
+                      {stat.value}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {stat.label}
+                    </Typography>
+                  </Box>
+                </Stack>
+              );
+            })}
+          </Box>
+        </Container>
+      </Box>
+
       <CasesCarousel />
+
+      {/* Testimonials */}
+      <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: "#F8FAFC" }}>
+        <Container maxWidth="lg">
+          <FadeIn>
+            <Typography variant="overline" color="primary" sx={{ fontWeight: 800, letterSpacing: 2 }}>
+              TESTIMONIOS
+            </Typography>
+            <Typography variant="h4" component="h2" sx={{ fontWeight: 900, mb: 4, mt: 1 }}>
+              Lo que dicen nuestros clientes
+            </Typography>
+          </FadeIn>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
+              gap: 3,
+            }}
+          >
+            {testimonials.map((t) => (
+              <Card
+                key={t.company}
+                elevation={0}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 3,
+                  height: "100%",
+                  display: "flex",
+                }}
+              >
+                <CardContent sx={{ p: 3, display: "flex", flexDirection: "column", flex: 1 }}>
+                  <FormatQuoteRounded sx={{ fontSize: 32, color: "primary.main", opacity: 0.5, mb: 1 }} />
+                  <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontStyle: "italic", color: "text.secondary", flex: 1 }}>
+                    &ldquo;{t.quote}&rdquo;
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                    {t.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {t.role} — {t.company}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Container>
+      </Box>
 
       <Box sx={{ py: { xs: 6, md: 8 }, background: "linear-gradient(180deg, #F0FDFA 0%, #F8FAFC 100%)" }}>
       <Container maxWidth="lg">
@@ -1566,6 +1666,139 @@ export function LandingPage() {
         </Container>
       </Box>
 
+      {/* Pricing Packages */}
+      <Box id="paquetes" sx={{ py: { xs: 6, md: 8 }, bgcolor: "#F8FAFC", scrollMarginTop: 80 }}>
+        <Container maxWidth="lg">
+          <FadeIn>
+            <Typography variant="overline" color="primary" sx={{ fontWeight: 800, letterSpacing: 2 }}>
+              PAQUETES
+            </Typography>
+            <Typography variant="h4" component="h2" sx={{ fontWeight: 900, mb: 1, mt: 1 }}>
+              Inversión clara desde el inicio
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 640 }}>
+              Precios transparentes, sin costos ocultos. Cada paquete incluye diseño, desarrollo y puesta en producción.
+            </Typography>
+          </FadeIn>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
+              gap: 3,
+              alignItems: "stretch",
+            }}
+          >
+            {pricingPackages.map((pkg) => {
+              const Icon = pkg.icon;
+              return (
+                <Card
+                  key={pkg.title}
+                  elevation={0}
+                  sx={{
+                    border: pkg.popular ? "2px solid" : "1px solid",
+                    borderColor: pkg.popular ? pkg.accent : "divider",
+                    borderRadius: 3,
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    transition: "transform 0.25s ease, box-shadow 0.25s ease",
+                    "&:hover": {
+                      transform: "translateY(-4px)",
+                      boxShadow: `0 16px 40px ${pkg.accent}20`,
+                    },
+                  }}
+                >
+                  {pkg.popular && (
+                    <Chip
+                      label="Más popular"
+                      size="small"
+                      sx={{
+                        position: "absolute",
+                        top: -12,
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        bgcolor: pkg.accent,
+                        color: "#fff",
+                        fontWeight: 700,
+                        fontSize: "0.7rem",
+                      }}
+                    />
+                  )}
+                  <CardContent sx={{ p: 3, flex: 1, display: "flex", flexDirection: "column" }}>
+                    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
+                      <Box
+                        sx={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 1.5,
+                          bgcolor: `${pkg.accent}14`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Icon sx={{ fontSize: 24, color: pkg.accent }} />
+                      </Box>
+                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                        {pkg.title}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" alignItems="baseline" spacing={0.5} sx={{ mb: 0.5 }}>
+                      <Typography variant="h4" sx={{ fontWeight: 900, color: pkg.accent }}>
+                        {pkg.price}
+                      </Typography>
+                    </Stack>
+                    <Typography variant="caption" color="text.secondary" sx={{ mb: 2 }}>
+                      {pkg.period} · Entrega: {pkg.delivery}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+                      {pkg.description}
+                    </Typography>
+                    <Stack spacing={1} sx={{ mb: 3, flex: 1 }}>
+                      {pkg.features.map((f) => (
+                        <Stack key={f} direction="row" spacing={1} alignItems="flex-start">
+                          <CheckCircleRounded sx={{ fontSize: 18, color: pkg.accent, mt: 0.2 }} />
+                          <Typography variant="body2">{f}</Typography>
+                        </Stack>
+                      ))}
+                    </Stack>
+                    <Divider sx={{ mb: 2 }} />
+                    <Typography variant="caption" color="text.secondary" sx={{ mb: 2, textAlign: "center" }}>
+                      50% al inicio, 50% al entregar · Facturamos
+                    </Typography>
+                    <Button
+                      href="#cotiza"
+                      variant={pkg.popular ? "contained" : "outlined"}
+                      fullWidth
+                      sx={{
+                        textTransform: "none",
+                        fontWeight: 700,
+                        borderRadius: 2,
+                        py: 1.2,
+                        ...(pkg.popular
+                          ? { bgcolor: pkg.accent, "&:hover": { bgcolor: pkg.accent, filter: "brightness(0.9)" } }
+                          : { borderColor: pkg.accent, color: pkg.accent }),
+                      }}
+                      onClick={() => trackEvent("cta_click", { location: "pricing", package: pkg.title })}
+                    >
+                      Cotizar {pkg.title.toLowerCase()}
+                    </Button>
+                    <Button
+                      component={Link}
+                      href={`/blog/${pkg.blogSlug}`}
+                      size="small"
+                      sx={{ textTransform: "none", mt: 1, color: "text.secondary", fontSize: "0.75rem" }}
+                    >
+                      Ver desglose completo en el blog
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </Box>
+        </Container>
+      </Box>
+
       <Box
         sx={{
           py: { xs: 6, md: 8 },
@@ -1634,6 +1867,38 @@ export function LandingPage() {
 
       <QuoteSection />
 
+      {/* Tech Stack */}
+      <Box sx={{ py: { xs: 4, md: 5 }, bgcolor: "background.paper", borderTop: "1px solid", borderBottom: "1px solid", borderColor: "divider" }}>
+        <Container maxWidth="lg">
+          <Typography variant="overline" sx={{ fontWeight: 700, letterSpacing: 2, color: "text.disabled", display: "block", textAlign: "center", mb: 3 }}>
+            TECNOLOGÍAS QUE USAMOS
+          </Typography>
+          <Stack
+            direction="row"
+            spacing={{ xs: 2, md: 4 }}
+            justifyContent="center"
+            flexWrap="wrap"
+            useFlexGap
+            sx={{ rowGap: 2 }}
+          >
+            {techStack.map((tech) => (
+              <Chip
+                key={tech.name}
+                label={tech.name}
+                variant="outlined"
+                size="medium"
+                sx={{
+                  fontWeight: 600,
+                  borderColor: "divider",
+                  bgcolor: "background.default",
+                  "&:hover": { borderColor: "primary.main" },
+                }}
+              />
+            ))}
+          </Stack>
+        </Container>
+      </Box>
+
       <Box sx={{ bgcolor: "#F8FAFC" }}>
       <Container maxWidth="md" id="faq" sx={{ py: { xs: 6, md: 8 }, scrollMarginTop: 80 }}>
         <FadeIn>
@@ -1687,6 +1952,10 @@ export function LandingPage() {
                 variant="contained"
                 size="large"
                 startIcon={<WhatsAppIcon />}
+                onClick={() => {
+                  trackEvent("wa_click", { location: "final_cta" });
+                  trackEvent("conversion", { type: "whatsapp", location: "final_cta" });
+                }}
                 sx={{
                   textTransform: "none",
                   fontWeight: 800,
@@ -1725,15 +1994,8 @@ export function LandingPage() {
             direction={{ xs: "column", md: "row" }}
             spacing={4}
             justifyContent="space-between"
-            divider={
-              <Divider
-                orientation="vertical"
-                flexItem
-                sx={{ display: { xs: "none", md: "block" }, borderColor: "grey.800" }}
-              />
-            }
           >
-            <Box>
+            <Box sx={{ maxWidth: 340 }}>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
                 <Avatar sx={{ bgcolor: "primary.main", width: 40, height: 40 }}>
                   <BoltRounded sx={{ fontSize: 22 }} />
@@ -1742,65 +2004,57 @@ export function LandingPage() {
                   Moving Quicker
                 </Typography>
               </Stack>
-              <Typography variant="body2" sx={{ maxWidth: 320, opacity: 0.85 }}>
+              <Typography variant="body2" sx={{ opacity: 0.85, mb: 2 }}>
                 Soluciones digitales para PyMEs en México: landing pages, software y consultoría.
               </Typography>
+              <Stack spacing={1}>
+                <Box component="a" href="mailto:contacto@movingquicker.com" sx={{ display: "flex", alignItems: "center", gap: 1, color: "grey.300", textDecoration: "none", "&:hover": { color: "primary.light" } }}>
+                  <EmailRounded sx={{ fontSize: 16, opacity: 0.7 }} />
+                  <Typography variant="body2">contacto@movingquicker.com</Typography>
+                </Box>
+                <Box component="a" href={waHref("Hola, vi su sitio y quiero más información.")} target="_blank" rel="noopener noreferrer" sx={{ display: "flex", alignItems: "center", gap: 1, color: "grey.300", textDecoration: "none", "&:hover": { color: "primary.light" } }}>
+                  <WhatsAppIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                  <Typography variant="body2">938 109 5593</Typography>
+                </Box>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <PlaceRounded sx={{ fontSize: 16, opacity: 0.7 }} />
+                  <Typography variant="body2" sx={{ opacity: 0.85 }}>
+                    Mérida, Yucatán, México
+                  </Typography>
+                </Stack>
+              </Stack>
             </Box>
             <Box>
               <Typography variant="subtitle2" sx={{ color: "common.white", fontWeight: 700, mb: 1.5 }}>
                 Soluciones
               </Typography>
               <Stack spacing={1}>
-                <Button
-                  href="#soluciones"
-                  color="inherit"
-                  sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}
-                >
+                <Button href="#soluciones" color="inherit" sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}>
                   Presencia web
                 </Button>
-                <Button
-                  href="#soluciones"
-                  color="inherit"
-                  sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}
-                >
+                <Button href="#soluciones" color="inherit" sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}>
                   Software
                 </Button>
-                <Button
-                  href="#cotiza"
-                  color="inherit"
-                  sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}
-                >
+                <Button href="#paquetes" color="inherit" sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}>
+                  Paquetes
+                </Button>
+                <Button href="#cotiza" color="inherit" sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}>
                   Cotizar
                 </Button>
               </Stack>
             </Box>
             <Box>
               <Typography variant="subtitle2" sx={{ color: "common.white", fontWeight: 700, mb: 1.5 }}>
-                Legal y blog
+                Recursos
               </Typography>
               <Stack spacing={1}>
-                <Button
-                  component={Link}
-                  href="/blog"
-                  color="inherit"
-                  sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}
-                >
+                <Button component={Link} href="/blog" color="inherit" sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}>
                   Blog
                 </Button>
-                <Button
-                  component={Link}
-                  href="/privacidad"
-                  color="inherit"
-                  sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}
-                >
+                <Button component={Link} href="/privacidad" color="inherit" sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}>
                   Privacidad
                 </Button>
-                <Button
-                  component={Link}
-                  href="/terminos"
-                  color="inherit"
-                  sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}
-                >
+                <Button component={Link} href="/terminos" color="inherit" sx={{ justifyContent: "flex-start", textTransform: "none", opacity: 0.9 }}>
                   Términos
                 </Button>
               </Stack>
@@ -1814,7 +2068,7 @@ export function LandingPage() {
             spacing={2}
           >
             <Typography variant="caption" sx={{ opacity: 0.7 }}>
-              © {new Date().getFullYear()} Moving Quicker.
+              © {new Date().getFullYear()} Moving Quicker. Mérida, Yucatán.
             </Typography>
             <IconButton
               onClick={scrollToTop}

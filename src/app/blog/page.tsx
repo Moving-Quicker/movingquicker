@@ -8,10 +8,8 @@ import CardActionArea from "@mui/material/CardActionArea";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
 import CalendarTodayIcon from "@mui/icons-material/CalendarTodayRounded";
 import TimerIcon from "@mui/icons-material/TimerRounded";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import Image from "next/image";
 
 export const metadata: Metadata = {
@@ -41,16 +39,6 @@ export default async function BlogPage({
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh", py: { xs: 4, md: 6 } }}>
       <Container maxWidth="md">
-        <Button
-          href="/"
-          startIcon={<HomeRoundedIcon />}
-          size="small"
-          sx={{ mb: 2 }}
-          component="a"
-        >
-          Volver al inicio
-        </Button>
-
         <Typography variant="h3" component="h1" sx={{ fontWeight: 800, mb: 1 }}>
           Blog
         </Typography>

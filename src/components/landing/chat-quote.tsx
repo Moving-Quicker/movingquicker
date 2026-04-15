@@ -264,7 +264,6 @@ export function ChatQuote() {
     setPhase("SENDING");
 
     try {
-      trackEvent("chat_lead_submitted", { projectType, pages, extras });
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -279,16 +278,20 @@ export function ChatQuote() {
       });
 
       if (res.ok) {
+        trackEvent("chat_lead_submitted", { projectType, pages, extras });
+        trackEvent("conversion", { type: "form", location: "chat_quote" });
         await typeMany(
           "¡Listo! Recibimos tu información. ✅",
           "Te contactamos pronto por WhatsApp para afinar los detalles y darte una cotización formal.",
         );
         setPhase("DONE");
       } else {
+        trackEvent("form_submit_error", { error: "api_error", location: "chat_quote" });
         await typeOne("Hubo un problema al enviar. ¿Podrías intentarlo por WhatsApp?");
         setPhase("DONE");
       }
     } catch {
+      trackEvent("form_submit_error", { error: "network", location: "chat_quote" });
       await typeOne("Error de conexión. Intenta por WhatsApp directamente.");
       setPhase("DONE");
     }
