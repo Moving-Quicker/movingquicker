@@ -7,6 +7,7 @@ import { PostHogProvider as PHProvider } from "posthog-js/react";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { theme } from "@/theme";
+import { persistUtm, getFirstTouchUrl } from "@/lib/tracking";
 
 const PH_KEY =
   process.env.NEXT_PUBLIC_POSTHOG_KEY ?? "phc_tEzFgzf3TCrfzL3MUHwiPDZnvGggV7jAVswxb4AsWmtE";
@@ -30,6 +31,9 @@ function PostHogInit() {
       person_profiles: "identified_only",
       persistence: "localStorage+cookie",
     });
+
+    persistUtm();
+    getFirstTouchUrl();
   }, []);
   return null;
 }

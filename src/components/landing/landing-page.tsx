@@ -65,7 +65,7 @@ import EmailRounded from "@mui/icons-material/EmailRounded";
 import PlaceRounded from "@mui/icons-material/PlaceRounded";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ChatQuote } from "@/components/landing/chat-quote";
-import { trackEvent, getVariant } from "@/lib/tracking";
+import { trackEvent, getVariant, identifyLead, getPersistedUtm, getFirstTouchUrl } from "@/lib/tracking";
 
 // ---------- helpers & env ----------
 
@@ -1190,6 +1190,10 @@ function ContactForm() {
           businessType: businessType || undefined,
           message: message.trim(),
           source: "form",
+          utmSource: getPersistedUtm().utm_source,
+          utmMedium: getPersistedUtm().utm_medium,
+          utmCampaign: getPersistedUtm().utm_campaign,
+          landingPage: getFirstTouchUrl(),
           _hp: hp,
           _t: mountedAt.current,
         }),
@@ -1200,7 +1204,18 @@ function ContactForm() {
         setError(data.error ?? "No se pudo enviar. Intenta de nuevo.");
         return;
       }
-      trackEvent("form_lead_submitted", { businessType: businessType || "unknown" });
+      identifyLead({
+        email: email.trim(),
+        name: name.trim(),
+        source: "form",
+        businessType: businessType || undefined,
+      });
+      const utms = getPersistedUtm();
+      trackEvent("form_lead_submitted", {
+        businessType: businessType || "unknown",
+        landing_page: getFirstTouchUrl(),
+        ...utms,
+      });
       trackEvent("conversion", { type: "form", location: "contact_form" });
       setSuccess(true);
       setName("");

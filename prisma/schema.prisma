@@ -15,6 +15,10 @@ model Lead {
   businessType String?  @map("business_type")
   message      String
   source       String   @db.VarChar(20) // "form", "chat"
+  utmSource    String?  @map("utm_source") @db.VarChar(100)
+  utmMedium    String?  @map("utm_medium") @db.VarChar(100)
+  utmCampaign  String?  @map("utm_campaign") @db.VarChar(200)
+  landingPage  String?  @map("landing_page") @db.VarChar(500)
   createdAt    DateTime @default(now()) @map("created_at")
 
   @@index([source])

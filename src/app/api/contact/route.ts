@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Datos inválidos." }, { status: 400 });
   }
 
-  const { name, email, whatsapp, businessType, message, source, _hp, _t } =
+  const { name, email, whatsapp, businessType, message, source, utmSource, utmMedium, utmCampaign, landingPage, _hp, _t } =
     body as Record<string, unknown>;
 
   if (typeof _hp === "string" && _hp.length > 0) {
@@ -70,6 +70,10 @@ export async function POST(request: Request) {
         businessType: business,
         message: cleanMessage,
         source: typeof source === "string" ? source : "form",
+        utmSource: typeof utmSource === "string" && utmSource ? utmSource.slice(0, 100) : undefined,
+        utmMedium: typeof utmMedium === "string" && utmMedium ? utmMedium.slice(0, 100) : undefined,
+        utmCampaign: typeof utmCampaign === "string" && utmCampaign ? utmCampaign.slice(0, 200) : undefined,
+        landingPage: typeof landingPage === "string" && landingPage ? landingPage.slice(0, 500) : undefined,
       },
     });
   } catch (err) {

@@ -21,7 +21,7 @@ import BoltRounded from "@mui/icons-material/BoltRounded";
 import PersonRounded from "@mui/icons-material/PersonRounded";
 import SendRounded from "@mui/icons-material/SendRounded";
 import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
-import { trackEvent } from "@/lib/tracking";
+import { trackEvent, identifyLead, getPersistedUtm, getFirstTouchUrl } from "@/lib/tracking";
 
 // ── Types ──
 
@@ -264,6 +264,7 @@ export function ChatQuote() {
     setPhase("SENDING");
 
     try {
+      const utms = getPersistedUtm();
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -273,12 +274,27 @@ export function ChatQuote() {
           businessType: PROJECT_OPTIONS.find((p) => p.key === projectType)?.label ?? "",
           message: `[Chat Quote] Tipo: ${projectType}, Páginas: ${pages}, Extras: ${extras.join(",") || "ninguno"}. Mensaje: ${message.trim()}`,
           source: "chat",
+          utmSource: utms.utm_source,
+          utmMedium: utms.utm_medium,
+          utmCampaign: utms.utm_campaign,
+          landingPage: getFirstTouchUrl(),
           _t: Date.now() - 30000,
         }),
       });
 
       if (res.ok) {
-        trackEvent("chat_lead_submitted", { projectType, pages, extras });
+        identifyLead({
+          email: email.trim(),
+          name: name.trim(),
+          source: "chat",
+          businessType: PROJECT_OPTIONS.find((p) => p.key === projectType)?.label,
+          projectType,
+        });
+        trackEvent("chat_lead_submitted", {
+          projectType, pages, extras,
+          landing_page: getFirstTouchUrl(),
+          ...utms,
+        });
         trackEvent("conversion", { type: "form", location: "chat_quote" });
         await typeMany(
           "¡Listo! Recibimos tu información. ✅",
