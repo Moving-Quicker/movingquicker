@@ -11,9 +11,17 @@ import { theme } from "@/theme";
 const PH_KEY =
   process.env.NEXT_PUBLIC_POSTHOG_KEY ?? "phc_tEzFgzf3TCrfzL3MUHwiPDZnvGggV7jAVswxb4AsWmtE";
 
+const BOT_RE =
+  /bot|crawl|spider|slurp|facebookexternalhit|linkedinbot|twitterbot|whatsapp|telegrambot|bingpreview|yandex|baidu|duckduck|ia_archiver|pingdom|uptimerobot|headlesschrome|phantomjs|prerender|lighthouse|gtmetrix/i;
+
+function isBot(): boolean {
+  if (typeof navigator === "undefined") return true;
+  return BOT_RE.test(navigator.userAgent);
+}
+
 function PostHogInit() {
   useEffect(() => {
-    if (!PH_KEY) return;
+    if (!PH_KEY || isBot()) return;
     posthog.init(PH_KEY, {
       api_host: "/ingest",
       ui_host: "https://us.posthog.com",

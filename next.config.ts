@@ -14,11 +14,20 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.movingquicker.com" }],
+        destination: "https://movingquicker.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       { source: "/ingest/static/:path*", destination: "https://us-assets.i.posthog.com/static/:path*" },
       { source: "/ingest/:path*", destination: "https://us.i.posthog.com/:path*" },
-      { source: "/ingest/decide", destination: "https://us.i.posthog.com/decide" },
     ];
   },
   skipTrailingSlashRedirect: true,

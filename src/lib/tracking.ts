@@ -2,9 +2,14 @@ import posthog from "posthog-js";
 
 const isDev = process.env.NODE_ENV === "development";
 
+function phReady(): boolean {
+  if (typeof window === "undefined") return false;
+  return posthog.__loaded === true;
+}
+
 export function trackEvent(type: string, metadata?: Record<string, unknown>) {
   try {
-    if (typeof window === "undefined") return;
+    if (!phReady()) return;
     posthog.capture(type, metadata);
     if (isDev) console.debug("[PostHog]", type, metadata);
   } catch (err) {
@@ -14,7 +19,7 @@ export function trackEvent(type: string, metadata?: Record<string, unknown>) {
 
 export function getVariant(flag: string): string | undefined {
   try {
-    if (typeof window === "undefined") return undefined;
+    if (!phReady()) return undefined;
     const value = posthog.getFeatureFlag(flag);
     return typeof value === "string" ? value : undefined;
   } catch {
