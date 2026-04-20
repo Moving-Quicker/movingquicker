@@ -1066,8 +1066,11 @@ function CasesCarousel() {
 
 function QuoteSection() {
   const variant = getVariant("quote-section") ?? "control";
+  const tracked = useRef(false);
 
   useEffect(() => {
+    if (tracked.current) return;
+    tracked.current = true;
     trackEvent("quote_section_view", { variant });
   }, [variant]);
 

@@ -12,6 +12,7 @@ interface BlogTrackerProps {
 export function BlogTracker({ slug, title, tags }: BlogTrackerProps) {
   const tracked = useRef({ "25": false, "50": false, "75": false, "100": false });
   const startTime = useRef(Date.now());
+  const sentTime = useRef(false);
 
   useEffect(() => {
     trackEvent("blog_view", { slug, title, tags });
@@ -30,17 +31,25 @@ export function BlogTracker({ slug, title, tags }: BlogTrackerProps) {
       }
     }
 
-    function onBeforeUnload() {
+    function sendTimeOnPage() {
+      if (sentTime.current) return;
+      sentTime.current = true;
       const seconds = Math.round((Date.now() - startTime.current) / 1000);
       trackEvent("blog_time_on_page", { slug, seconds });
     }
 
+    function onVisibilityChange() {
+      if (document.visibilityState === "hidden") sendTimeOnPage();
+    }
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("beforeunload", onBeforeUnload);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("beforeunload", sendTimeOnPage);
 
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("beforeunload", onBeforeUnload);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("beforeunload", sendTimeOnPage);
     };
   }, [slug, title, tags]);
 
